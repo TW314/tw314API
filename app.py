@@ -1,7 +1,8 @@
 from flask import Flask
+from pip._vendor import requests
 app = Flask(__name__)
 
-
+fila =[]
 @app.route('/')
-def hello_world():
-    return 'Hello, World!'
+def fila(add):
+    return fila.append(add)
