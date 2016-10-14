@@ -11,6 +11,7 @@ def __init__(self):
     self.ticket = []
 
 
+
 @app.route('/insere')
 def entrar_na_fila(self, elemento):
     if(prioridade == 1):
