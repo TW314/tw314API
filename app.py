@@ -1,13 +1,12 @@
 from flask import Flask
 # from pip._vendor import requests
 from random import *
+import string
 
 app = Flask(__name__)
 
-
 if __name__ == '__main__':
 	app.run(debug = True)
-
 
 # r = requests.get('http://localhost:3000/consultaInformacoesUsuariosPorPerfil/2').json()
 normal = []
@@ -22,12 +21,14 @@ def __init__():
 
 @app.route('/insere')
 def entrar_na_fila():
+	# simulando valores
 	prioridade = randint(0, 1)
 	elemento = randint(0, 999)
 	if len(total) > c:
 		return eh_maior_que_c(prioridade, elemento)
 	else:
 		return nao_eh_maior_que_c(prioridade, elemento, 1)
+
 
 # todo: bug aqui
 def eh_maior_que_c(prioridade, elemento):
@@ -57,7 +58,7 @@ total = normal.copy()
 
 
 def priority(n = 0, k = 0):
-	for i in range(len(normal+prioritaria)):
+	for i in range(len(normal + prioritaria)):
 		total.insert(n, 0)
 		n += 3
 	for j in range(len(total)):
@@ -68,3 +69,5 @@ def priority(n = 0, k = 0):
 			total.remove(0)
 	return str(total)
 
+
+print(''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits)))
