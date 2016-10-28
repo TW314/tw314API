@@ -12,28 +12,51 @@ if __name__ == '__main__':
 # r = requests.get('http://localhost:3000/consultaInformacoesUsuariosPorPerfil/2').json()
 normal = []
 prioritaria = []
-total = []
+c = 10
 
 
 @app.route('/')
 def __init__():
-	for i in range(99):
-		prioridade = randint(0, 1)
-		elemento = randint(0, 999)
-		entrar_na_fila(elemento, prioridade)
-	return priority()
+	return str(total)
 
 
 @app.route('/insere')
-def entrar_na_fila(elemento, prioridade):
+def entrar_na_fila():
+	prioridade = randint(0, 1)
+	elemento = randint(0, 999)
+	if len(total) > c:
+		return eh_maior_que_c(prioridade, elemento)
+	else:
+		return nao_eh_maior_que_c(prioridade, elemento, 1)
+
+# todo: bug aqui
+def eh_maior_que_c(prioridade, elemento):
+	for i in range(c):
+		if prioridade == 1:
+			prioritaria.append(elemento)
+		elif prioridade == 0:
+			normal.append(elemento)
+		return priority()
+
+
+def nao_eh_maior_que_c(prioridade, elemento, i):
+	i += 1
 	if prioridade == 1:
-		prioritaria.append(elemento)
+		total.insert(i, elemento)
 	elif prioridade == 0:
-		normal.append(elemento)
+		total.append(elemento)
+	return str(total)
+
+
+@app.route('/proximo')
+def chamar_proximo():
+	return str(total.pop(0))
+
+
+total = normal.copy()
 
 
 def priority(n = 0, k = 0):
-	total = normal.copy()
 	for i in range(len(normal+prioritaria)):
 		total.insert(n, 0)
 		n += 3
@@ -43,15 +66,5 @@ def priority(n = 0, k = 0):
 			k += 1
 		if 0 in total:
 			total.remove(0)
-	return fila_json(total)
+	return str(total)
 
-
-@app.route('/fila')
-def fila_json(total):
-	res = "TOTAL: " + str(total) + "<br>" + "PRIORITARIA: " + str(prioritaria) + "<br>" + "NORMAL: " + str(normal)
-	return res
-
-
-@app.route('/proximo')
-def chamar_proximo():
-	return total.pop(0)
