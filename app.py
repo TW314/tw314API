@@ -5,29 +5,28 @@ import string
 
 app = Flask(__name__)
 
-if __name__ == '__main__':
-	app.run(debug = True)
-
 # r = requests.get('http://localhost:3000/consultaInformacoesUsuariosPorPerfil/2').json()
-# ## GLOBAIS
-normal = []
-prioritaria = []
-total = [0]
-empty = []
+# ## GLOBAIS ##
+normal = [] # eh zerada apos inserir em total
+prioritaria = [] # zerada apos inserir em total
+total = []
 c = 10
+count_insere = False
 
 
 @app.route('/')
-def __init__():
+def fila():
 	return priority()
 
 
 @app.route('/insere')
 def entrar_na_fila():
 	# simulando valores
+	global count_insere
 	prioridade = randint(0, 1)
 	elemento = randint(0, 999)
 	eh_maior_que_c(prioridade, elemento)
+	count_insere = True
 	return "NORMAL: " + str(normal) + "<br>" + "PRIORITÁRIO: " + str(prioritaria)
 
 
@@ -51,22 +50,38 @@ def nao_eh_maior_que_c(prioridade, elemento, i):
 
 @app.route('/proximo')
 def chamar_proximo():
-	return str(total.pop(0))
+	res = total.pop(0) if total else None
+	return str(res)
 
 
-def priority(n = total.index(total[-1]), k = 0):
-	if total != empty:
-		if normal or prioritaria != empty:
-			total.extend(normal.copy())
-			for i in range(len(normal + prioritaria)):
-				total.insert(n, 0)
-				n += 3
-			for j in range(len(total)):
-				if k < len(prioritaria):
-					total.insert(total.index(0), prioritaria[k])
-					k += 1
-				if 0 in total:
-					total.remove(0)
-		# normal[:] = empty[:]
-		# prioritaria[:] = empty[:]
+def monta_total(n, k):
+	t = []
+	global normal
+	global prioritaria
+	if normal or prioritaria:
+		t.extend(normal.copy())
+		for i in range(len(normal + prioritaria)):
+			t.insert(n, 0)
+			n += 3
+		for j in range(len(t)):
+			if k < len(prioritaria):
+				t.insert(t.index(0), prioritaria[k])
+				k += 1
+			if 0 in t:
+				t.remove(0)
+		normal = []
+		prioritaria = []
+		total.extend(t)
+
+
+def priority(k = 0):
+	global count_insere
+	if count_insere:
+		n = 0
+		monta_total(n, k)
+		count_insere = False
 	return str(total)
+
+
+if __name__ == '__main__':
+	app.run(debug = True)
