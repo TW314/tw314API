@@ -7,10 +7,11 @@ app = Flask(__name__)
 
 # r = requests.get('http://localhost:3000/consultaInformacoesUsuariosPorPerfil/2').json()
 # ## GLOBAIS ##
-normal = [] # eh zerada apos inserir em total
-prioritaria = [] # zerada apos inserir em total
+normal = []  # eh zerada apos inserir em total
+prioritaria = []  # zerada apos inserir em total
 total = []
-c = 10
+ins = 0
+c = 5
 count_insere = False
 
 
@@ -23,6 +24,8 @@ def fila():
 def entrar_na_fila():
 	# simulando valores
 	global count_insere
+	global ins
+	ins += 1
 	prioridade = randint(0, 1)
 	elemento = randint(0, 999)
 	eh_maior_que_c(prioridade, elemento)
@@ -36,16 +39,11 @@ def eh_maior_que_c(prioridade, elemento):
 	elif prioridade == 0:
 		normal.append(elemento)
 
-# todo: Pensar em lógica melhor pra quando a fila ainda for pequena
-"""
-def nao_eh_maior_que_c(prioridade, elemento, i):
-	i += 1
-	if prioridade == 1:
-		total.insert(i, elemento)
-	elif prioridade == 0:
-		total.append(elemento)
-	return str(total)
-"""
+
+def nao_eh_maior_que_c(prioridade, elemento):
+	global total
+	eh_maior_que_c(prioridade, elemento)
+	total = prioritaria + normal
 
 
 @app.route('/proximo')
@@ -56,22 +54,26 @@ def chamar_proximo():
 
 def monta_total(n, k):
 	t = []
-	global normal
-	global prioritaria
+	global normal, prioritaria, total
 	if normal or prioritaria:
-		t.extend(normal.copy())
-		for i in range(len(normal + prioritaria)):
-			t.insert(n, 0)
-			n += 3
-		for j in range(len(t)):
-			if k < len(prioritaria):
-				t.insert(t.index(0), prioritaria[k])
-				k += 1
-			if 0 in t:
-				t.remove(0)
+		if ins > c:
+			t.extend(normal.copy())
+			for i in range(len(normal + prioritaria)):
+				t.insert(n, 0)
+				n += 3
+			for j in range(len(t)):
+				if k < len(prioritaria):
+					t.insert(t.index(0), prioritaria[k])
+					k += 1
+				if 0 in t:
+					t.remove(0)
+			total.extend(t)
+		elif ins <= c:
+			total.extend(prioritaria + normal)
+		else:
+			pass
 		normal = []
 		prioritaria = []
-		total.extend(t)
 
 
 def priority(k = 0):
