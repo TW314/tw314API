@@ -1,7 +1,6 @@
 from flask import Flask
 # from pip._vendor import requests
 from random import *
-import string
 
 app = Flask(__name__)
 
@@ -12,76 +11,71 @@ prioritaria = []  # zerada apos inserir em total
 total = []
 ins = 0
 c = 5
-count_insere = False
+se_inseriu = False # flag para controle se está inserindo ou não
 
 
-@app.route('/')
+# mostra lista contendo a fila já organizada
+@app.route('/mostrar_fila')
 def fila():
-	return priority()
+	return str(total)
 
 
-@app.route('/insere')
+# insere elemento vindo do banco na fila - todo: definir for por tamanha do request
+@app.route('/inserir_na_fila')
 def entrar_na_fila():
 	# simulando valores
-	global count_insere
+	global se_inseriu
 	global ins
 	ins += 1
+	# valores para teste - todo : puxar valores reais
 	prioridade = randint(0, 1)
 	elemento = randint(0, 999)
-	eh_maior_que_c(prioridade, elemento)
-	count_insere = True
+	
+	inserir_nos_auxiliares(prioridade, elemento)
+	# se_inseriu = True
+	priority()
 	return "NORMAL: " + str(normal) + "<br>" + "PRIORITÁRIO: " + str(prioritaria)
 
 
-def eh_maior_que_c(prioridade, elemento):
+# insere elementos nas filas auxiliares prioritaria e normal, de acordo com a prioridade
+def inserir_nos_auxiliares(prioridade, elemento):
 	if prioridade == 1:
 		prioritaria.append(elemento)
 	elif prioridade == 0:
 		normal.append(elemento)
 
 
-def nao_eh_maior_que_c(prioridade, elemento):
-	global total
-	eh_maior_que_c(prioridade, elemento)
-	total = prioritaria + normal
+# pop na lista total do ultimo elemento se total nao for vazio
+@app.route('/chamar_proximo')
+def pop_total():
+	return str(total.pop(0) if total else None)
 
 
-@app.route('/proximo')
-def chamar_proximo():
-	res = total.pop(0) if total else None
-	return str(res)
-
-
+# insere elementos dos auxiliares na lista total de acordo com a regra de negocio
 def monta_total(n, k):
-	t = []
-	global normal, prioritaria, total
-	if normal or prioritaria:
-		if ins > c:
-			t.extend(normal.copy())
+	global normal, prioritaria, total # chamando listas globais dentro do metodo
+	if normal or prioritaria:   # verifica se ha valor nas listas auxiliares
+		if ins > c:      # se quantidade de insercoes for maior que parametrizacao pelo usuario
+			total = normal.copy()
 			for i in range(len(normal + prioritaria)):
-				t.insert(n, 0)
+				total.insert(n, 0) # insere 0 na posicao n de total
 				n += 3
-			for j in range(len(t)):
+			for j in range(len(total)):
 				if k < len(prioritaria):
-					t.insert(t.index(0), prioritaria[k])
+					total.insert(total.index(0), prioritaria[k]) # insere elementos prioritarios nas posicoes onde ha 0
 					k += 1
-				if 0 in t:
-					t.remove(0)
-			total.extend(t)
-		elif ins <= c:
-			total.extend(prioritaria + normal)
-		else:
-			pass
-		normal = []
-		prioritaria = []
+				if 0 in total: # remove elementos de valor 0 da lista total
+					total.remove(0)
+		elif ins <= c:     # se quantidade de insercoes for menor que parametrizacao pelo usuario
+			total = prioritaria.copy() + normal.copy() # total recebe soma entre prioritaria e norma (nessa ordem)
 
 
 def priority(k = 0):
-	global count_insere
-	if count_insere:
-		n = 0
-		monta_total(n, k)
-		count_insere = False
+	global se_inseriu
+	# if se_inseriu: # se flag de
+	n = 0
+	monta_total(n, k)
+	#se_inseriu = False
 	return str(total)
 
 
